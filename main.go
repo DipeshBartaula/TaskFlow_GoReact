@@ -27,10 +27,12 @@ var collection *mongo.Collection
 func main() {
 	fmt.Println("hello World")
 
-	// Load environment variables from the .env file
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file:", err)
+	if os.Getenv("ENV") != "production" {
+		// Load environment variables if not in production
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file:", err)
+		}
 	}
 
 	// Get the MongoDB URI from the environment variables
@@ -80,6 +82,9 @@ func main() {
 		port = "5000"
 	}
 
+	if os.Getenv("ENV") == "production" {
+		app.Static("/", "./client/dist")
+	}
 	// Start the Fiber app and listen on the specified port
 	// Log and terminate the application if there is an error during startup
 	log.Fatal(app.Listen("0.0.0.0:" + port))
